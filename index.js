@@ -10,10 +10,10 @@ const PASSWORD = 'admin123';
 
 
 app.use(morgan("dev"));
-app.use(express.urlencoded({extended:true}))// parse form data
+app.use(express.urlencoded({extended:true}))// parse data from a form
 app.use(express.static(path.join(__dirname, 'public')))
 
-app.use('/node-course',(req,res,next)=>{//protect node
+app.use('/node-course',(req,res,next)=>{//protect node-course
     const password=req.query.password;
     if(password===PASSWORD){
         next();
