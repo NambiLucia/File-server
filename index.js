@@ -1,51 +1,62 @@
-const express = require('express');
-const morgan = require('morgan');
-const path = require('path');
-const app = express();
-
-const PORT = 4000;
-const PASSWORD = 'admin123';
-
-
+const express=require("express");
+const morgan= require("morgan");
+const path =require("path");
+const session = require('express-session')
+const PASSWORD='admin123';
+const PORT =4000;
+const app =express()
 
 
-app.use(morgan("dev"));
-app.use(express.urlencoded({extended:true}))// parse data from a form
-app.use(express.static(path.join(__dirname, 'public')))
+//middleware
+app.use(morgan("dev"));//logs https request,responses
+app.use(express.urlencoded({extended:true}))
+app.use(session({
+    secret:'your_secret_key',
+    resave:false,
+    saveUninitialized:false,
+    cookie:{secure:false}
+}))
 
-app.use('/node-course',(req,res,next)=>{//protect node-course
-    const password=req.query.password;
-    if(password===PASSWORD){
+app.use(express.static(path.join(__dirname,'public'))) // serve static files
+
+const middleware=app.use("/node-course",(req,res,next)=>{
+    if(req.session.loggedIn){
         next();
 
     }
     else{
-        res.redirect('/login');
+        res.redirect("/login")
     }
 })
+
+
 
 app.get("/",(req,res)=>{
-    res.send("Welcome to the Server")
-
+    res.send("<h1>Welcome to the Server</h1>")
 })
+//serve login and node static pages
 app.get("/login",(req,res)=>{
-    res.sendFile(path.join(__dirname,'public',"login.html"))
-
+    res.sendFile(path.join(__dirname,"public","login.html"))
 })
-app.post("/login", (req,res)=>{ //handle login submission
+app.get("/node-course",(req,res)=>{
+    res.sendFile(path.join(__dirname,"public","node-course.html"))
+})
+
+//route handler for login
+app.post("/login",(req,res)=>{
     const {password}= req.body
     if(password===PASSWORD){
-        res.redirect(`/node-course?password=${PASSWORD}`)
+        req.session.loggedIn=true; //session variable to indicate user is logged in
+         
+        res.redirect(`/node-course`)
+      
+
     }
     else{
-        res.send("wrong password. Please try again")
+        res.status(401).send("Wrong password. Please try again")
     }
+
 });
-
-app.get("/node-course",(req,res)=>{
-    res.sendFile(path.join(__dirname,'public',"node-course.html"))
-
-})
 
 
 
@@ -53,3 +64,21 @@ app.listen(PORT,()=>{
     console.log(`Server is running on http://localhost:${PORT}/`)
 
 })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
