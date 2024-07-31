@@ -19,7 +19,7 @@ app.use(session({
 
 app.use(express.static(path.join(__dirname,'public'))) // serve static files
 
-const middleware=app.use("/node-course",(req,res,next)=>{
+app.use("/node-course",(req,res,next)=>{
     if(req.session.loggedIn){
         next();
 
