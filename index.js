@@ -2,16 +2,17 @@ const express=require("express");
 const morgan= require("morgan");
 const path =require("path");
 const session = require('express-session')
+const app =express()
+
 const PASSWORD='admin123';
 const PORT =4000;
-const app =express()
 
 
 //middleware
-app.use(morgan("dev"));//logs https request,responses
+app.use(morgan("dev"));  //logs https request details
 app.use(express.urlencoded({extended:true}))
 app.use(session({
-    secret:'your_secret_key',
+    secret:'admin123',
     resave:false,
     saveUninitialized:false,
     cookie:{secure:false}
@@ -19,6 +20,8 @@ app.use(session({
 
 app.use(express.static(path.join(__dirname,'public'))) // serve static files
 
+
+//middleware to protect node
 app.use("/node-course",(req,res,next)=>{
     if(req.session.loggedIn){
         next();
@@ -30,10 +33,10 @@ app.use("/node-course",(req,res,next)=>{
 })
 
 
-
 app.get("/",(req,res)=>{
     res.send("<h1>Welcome to the Server</h1>")
 })
+
 //serve login and node static pages
 app.get("/login",(req,res)=>{
     res.sendFile(path.join(__dirname,"public","login.html"))
@@ -46,7 +49,7 @@ app.get("/node-course",(req,res)=>{
 app.post("/login",(req,res)=>{
     const {password}= req.body
     if(password===PASSWORD){
-        req.session.loggedIn=true; //session variable to indicate user is logged in
+      req.session.loggedIn = true; //session variable to indicate user is logged in
          
         res.redirect(`/node-course`)
       
