@@ -9,7 +9,7 @@ const PORT = 4000;
 
 //middleware setup
 app.use(morgan("dev")); //logs https request details
-app.use(express.urlencoded({ extended: true })); //
+app.use(express.urlencoded({ extended: true })); 
 app.use(
   session({
     secret: "admin123",
